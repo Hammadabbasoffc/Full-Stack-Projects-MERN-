@@ -11,4 +11,9 @@ after this installation you have to install the react-table devDependencies
 npm i --save-dev @types/react-table
 
 ```
+Packages for admin Dashboard include
 
+```
+yarn add chart.js react-chartjs-2
+
+```
