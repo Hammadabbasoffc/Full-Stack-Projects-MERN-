@@ -1,9 +1,9 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, {  Schema } from "mongoose";
 import validator from "validator";
 
 interface IUser extends Document {
     _id: string,
-    naem: string,
+    name: string,
     email: string,
     photo: string,
     role: "admin" | "user",
@@ -65,4 +65,4 @@ userSchema.virtual("age").get(function () {
   return age;
 });
 
-export const User = mongoose.model("User", userSchema);
+export const User = mongoose.model<IUser>("User", userSchema);
