@@ -26,6 +26,7 @@ yarn add chart.js react-chartjs-2
 
 ```
 npm i express dotenv mongoose
+npm i validator
 
 ```
 after that install the types
