@@ -1,6 +1,19 @@
 import mongoose, { Schema } from "mongoose";
 import validator from "validator";
 
+interface IUser extends Document {
+    _id: string,
+    naem: string,
+    email: string,
+    photo: string,
+    role: "admin" | "user",
+    gender: "male" | "female",
+    dob: Date,
+    createdAt: Date,
+    updatedAt: Date,
+    age: number
+}
+
 const userSchema = new mongoose.Schema(
   {
     _id: {
