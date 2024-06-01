@@ -6,7 +6,7 @@ type ProductsProps = {
   name: string;
   price: number;
   stock: number;
-  handler: () => {};
+  handler: () =>{};
 };
 
 const server = "aslkhdfba"
