@@ -1,33 +1,31 @@
-import express from 'express'
+import express from 'express';
 
-
-// importing Routes
-import userRoute from './routes/user.js'
+// Importing Routes
+import userRoute from './routes/user.js';
 import { connectDB } from './utils/features.js';
-
+import { errorMiddleware } from './middlewares/error.js';
 
 const PORT = 3000;
-connectDB()
 
+// Connect to the database
+connectDB();
 
-const app = express()
+const app = express();
 
-app.use(express.json())
+// Middleware to parse JSON requests
+app.use(express.json());
 
-
-
-
-
+// User routes
 app.use('/api/v1/user', userRoute);
 
+// Root route
+app.get("/", (req, res) => {
+    res.send("Working Great");
+});
 
-app.get("/",(req, res)=>{
-    res.send("Working Great")
-})
+app.use(errorMiddleware)
 
-
-
-app.listen(PORT, ()=>{
-    console.log(`server is running at ${PORT}`);
-    
-})
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+});

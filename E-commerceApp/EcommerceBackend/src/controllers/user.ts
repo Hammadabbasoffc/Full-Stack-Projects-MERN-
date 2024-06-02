@@ -26,6 +26,7 @@ export const newUser = async (
     });
 
 
+   console.log(name, email, _id, photo, gender, dob);
    
 
     return res.status(200).json({
@@ -33,7 +34,7 @@ export const newUser = async (
       message: `Welcome, ${user.name}`,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: error,
     });
