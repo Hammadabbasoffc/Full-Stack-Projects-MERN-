@@ -1,9 +1,12 @@
 import express from 'express';
+import { connectDB } from './utils/features.js';
+import { errorMiddleware } from './middlewares/error.js';
+
 
 // Importing Routes
 import userRoute from './routes/user.js';
-import { connectDB } from './utils/features.js';
-import { errorMiddleware } from './middlewares/error.js';
+import productRoute from './routes/product.js'
+
 
 const PORT = 3000;
 
@@ -17,12 +20,15 @@ app.use(express.json());
 
 // User routes
 app.use('/api/v1/user', userRoute);
+app.use('/api/v1/product', productRoute);
 
 // Root route
 app.get("/", (req, res) => {
     res.send("Working Great");
 });
 
+
+app.use("/uploads", express.static("uploads"));
 app.use(errorMiddleware)
 
 // Start the server
