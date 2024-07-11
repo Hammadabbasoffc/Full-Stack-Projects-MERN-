@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { lazy, Suspense, useState } from "react";
-import { orange } from "../constants/color";
+import { orange } from "../../constants/color";
 import {
   Menu as MenuIcon,
   Search as SearchIcon,

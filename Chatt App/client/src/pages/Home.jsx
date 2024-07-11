@@ -1,6 +1,6 @@
 import React from 'react'
 import AppLayout from '../components/layout/AppLayout'
-import { grayColor } from "../components/constants/color";
+import { grayColor } from "../constants/color";
 import { Box, Typography } from '@mui/material'
 
 const Home = () => {
