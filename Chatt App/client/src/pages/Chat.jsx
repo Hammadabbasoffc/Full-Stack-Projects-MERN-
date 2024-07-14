@@ -3,31 +3,37 @@ import {
   Send as SendIcon,
 } from "@mui/icons-material";
 import { IconButton, Stack } from "@mui/material";
-import React, { Fragment } from "react";
-// import FileMenu from "../components/dialogs/FileMenu";
-import AppLayout from "../components/layout/AppLayout";
-// import { TypingLoader } from "../components/layout/Loaders";
-// import MessageComponent from "../components/shared/MessageComponent";
-import { InputBox } from "../components/Styles/StyledComponents";
-import { grayColor, orange } from "../constants/color";
+import React, { Fragment, useState } from "react";
+import { grayColor, orange } from '../constants/color';
+import AppLayout from '../components/layout/AppLayout'
 
-const Chat = ({
-  chatId,
-  user,
-  containerRef,
-  bottomRef,
-  allMessages,
-  userTyping,
-  message,
-  messageOnChange,
-  submitHandler,
-  handleFileOpen,
-  fileMenuAnchor,
-}) => {
+// Assuming InputBox, MessageComponent, and TypingLoader are defined somewhere in your codebase
+import { InputBox } from "../components/Styles/StyledComponents";
+
+const Chat = () => {
+  const [message, setMessage] = useState("");
+  const [allMessages, setAllMessages] = useState([]);
+  const [userTyping, setUserTyping] = useState(false);
+
+  const handleMessageChange = (e) => {
+    setMessage(e.target.value);
+    setUserTyping(true);
+  };
+
+  const handleFileOpen = () => {
+    console.log("File open clicked");
+  };
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    setAllMessages([...allMessages, { _id: Date.now(), text: message }]);
+    setMessage("");
+    setUserTyping(false);
+  };
+
   return (
     <Fragment>
       <Stack
-        ref={containerRef}
         boxSizing={"border-box"}
         padding={"1rem"}
         spacing={"1rem"}
@@ -38,11 +44,11 @@ const Chat = ({
           overflowY: "auto",
         }}
       >
-       
+        {allMessages.map((i) => (
+          <MessageComponent key={i._id} message={i} user="User" />
+        ))}
 
-       
-
-        <div ref={bottomRef} />
+        
       </Stack>
 
       <form
@@ -72,7 +78,7 @@ const Chat = ({
           <InputBox
             placeholder="Type Message Here..."
             value={message}
-            onChange={messageOnChange}
+            onChange={handleMessageChange}
           />
 
           <IconButton
@@ -92,10 +98,8 @@ const Chat = ({
           </IconButton>
         </Stack>
       </form>
-
-      {/* <FileMenu anchorE1={fileMenuAnchor} chatId={chatId} /> */}
     </Fragment>
   );
 };
 
-export default AppLayout(Chat);
+export default AppLayout()(Chat);
