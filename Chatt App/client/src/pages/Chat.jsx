@@ -4,10 +4,10 @@ import {
 } from "@mui/icons-material";
 import { IconButton, Stack } from "@mui/material";
 import React, { Fragment } from "react";
-import FileMenu from "../components/dialogs/FileMenu";
+// import FileMenu from "../components/dialogs/FileMenu";
 import AppLayout from "../components/layout/AppLayout";
-import { TypingLoader } from "../components/layout/Loaders";
-import MessageComponent from "../components/shared/MessageComponent";
+// import { TypingLoader } from "../components/layout/Loaders";
+// import MessageComponent from "../components/shared/MessageComponent";
 import { InputBox } from "../components/Styles/StyledComponents";
 import { grayColor, orange } from "../constants/color";
 
@@ -38,11 +38,9 @@ const Chat = ({
           overflowY: "auto",
         }}
       >
-        {allMessages.map((i) => (
-          <MessageComponent key={i._id} message={i} user={user} />
-        ))}
+       
 
-        {userTyping && <TypingLoader />}
+       
 
         <div ref={bottomRef} />
       </Stack>
@@ -95,7 +93,7 @@ const Chat = ({
         </Stack>
       </form>
 
-      <FileMenu anchorE1={fileMenuAnchor} chatId={chatId} />
+      {/* <FileMenu anchorE1={fileMenuAnchor} chatId={chatId} /> */}
     </Fragment>
   );
 };
