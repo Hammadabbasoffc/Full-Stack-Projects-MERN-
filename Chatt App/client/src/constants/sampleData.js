@@ -69,7 +69,7 @@ export const samepleChats = [
       content: "",
       _id: "sfnsdjkfsdnfkdddjsbnd",
       sender: {
-        _id: "sdfsdfsdf",
+        _id: "lkasjdhv",
         name: "Chaman  2",
       },
       chat: "chatId",

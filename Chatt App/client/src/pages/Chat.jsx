@@ -2,18 +2,27 @@ import {
   AttachFile as AttachFileIcon,
   Send as SendIcon,
 } from "@mui/icons-material";
-import { IconButton, Stack } from "@mui/material";
-import React, { Fragment, useState } from "react";
-import { grayColor, orange } from '../constants/color';
-import AppLayout from '../components/layout/AppLayout'
+import { Container, IconButton, Stack } from "@mui/material";
+import React, { Fragment, useRef, useState } from "react";
+import { grayColor, orange } from "../constants/color";
+import AppLayout from "../components/layout/AppLayout";
 
 // Assuming InputBox, MessageComponent, and TypingLoader are defined somewhere in your codebase
 import { InputBox } from "../components/Styles/StyledComponents";
-
+import FileMenu from "../components/dialogs/FileMenu";
+import {sampleMessage} from '../constants/sampleData'
+import MessageComponent from "../components/shared/MessageComponent";
 const Chat = () => {
+  const containerRef  = useRef(null)
+  const fileMenuRef = useRef(null)
   const [message, setMessage] = useState("");
   const [allMessages, setAllMessages] = useState([]);
   const [userTyping, setUserTyping] = useState(false);
+
+  const user = {
+    _id: "lkasjdhv",
+    name: "Hammad Abbas"
+  }
 
   const handleMessageChange = (e) => {
     setMessage(e.target.value);
@@ -34,6 +43,7 @@ const Chat = () => {
   return (
     <Fragment>
       <Stack
+        ref={containerRef}
         boxSizing={"border-box"}
         padding={"1rem"}
         spacing={"1rem"}
@@ -44,11 +54,9 @@ const Chat = () => {
           overflowY: "auto",
         }}
       >
-        {allMessages.map((i) => (
-          <MessageComponent key={i._id} message={i} user="User" />
+        {sampleMessage.map((i) => (
+          <MessageComponent key={i._id} message={i} user={user} />
         ))}
-
-        
       </Stack>
 
       <form
@@ -58,11 +66,12 @@ const Chat = () => {
         onSubmit={submitHandler}
       >
         <Stack
-          direction={"row"}
-          height={"100%"}
-          padding={"1rem"}
-          alignItems={"center"}
-          position={"relative"}
+           direction={"row"}
+           height={"100%"}
+           padding={"0.5rem"}
+           alignItems={"center"}
+           position={"relative"}
+           
         >
           <IconButton
             sx={{
@@ -71,6 +80,7 @@ const Chat = () => {
               rotate: "30deg",
             }}
             onClick={handleFileOpen}
+            ref={fileMenuRef}
           >
             <AttachFileIcon />
           </IconButton>
@@ -98,6 +108,7 @@ const Chat = () => {
           </IconButton>
         </Stack>
       </form>
+      <FileMenu />
     </Fragment>
   );
 };
