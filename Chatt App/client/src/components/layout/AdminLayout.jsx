@@ -60,7 +60,6 @@ const Sidebar = ({ w = "100%" }) => {
     console.log("Logout");
   };
 
-
   return (
     <Stack width={w} direction={"column"} p={"3rem"} spacing={"3rem"}>
       <Typography variant="h5" textTransform={"uppercase"}>
@@ -100,13 +99,9 @@ const Sidebar = ({ w = "100%" }) => {
   );
 };
 
-const isAdmin = true
+const isAdmin = true;
 
-const AdminLayout = ({children}) => {
-
- 
-
-
+const AdminLayout = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   const handleMobile = () => setIsMobile(!isMobile);
@@ -151,6 +146,6 @@ const AdminLayout = ({children}) => {
       </Drawer>
     </Grid>
   );
-}
+};
 
-export default AdminLayout
+export default AdminLayout;
