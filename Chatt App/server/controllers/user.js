@@ -1,29 +1,31 @@
+import { compare } from "bcrypt";
+import { NEW_REQUEST, REFETCH_CHATS } from "../constants/events.js";
+import { getOtherMember } from "../lib/helper.js";
+import { TryCatch } from "../middlewares/error.js";
+import { Chat } from "../models/chat.js";
+import { Request } from "../models/request.js";
+import { User } from "../models/user.js";
 import {
   cookieOptions,
   emitEvent,
   sendToken,
   uploadFilesToCloudinary,
 } from "../utils/features.js";
-import { compare } from "bcrypt";
-import { User } from "../models/user.js";
-import { TryCatch } from "../middlewares/error.js";
 import { ErrorHandler } from "../utils/utility.js";
-import { Chat } from "../models/chat.js";
-import { Request } from "../models/request.js";
-import { NEW_REQUEST, REFETCH_CHATS } from "../constants/eveents.js";
-import { getOtherMember } from "../lib/helper.js";
 
+// Create a new user and save it to the database and save token in cookie
 const newUser = TryCatch(async (req, res, next) => {
   const { name, username, password, bio } = req.body;
+
   const file = req.file;
 
-  if (!file) return next(new ErrorHandler("Pleas Upload avatar"));
+  if (!file) return next(new ErrorHandler("Please Upload Avatar"));
 
   const result = await uploadFilesToCloudinary([file]);
 
   const avatar = {
     public_id: result[0].public_id,
-    url: result[0].secure_url,
+    url: result[0].url,
   };
 
   const user = await User.create({
@@ -34,21 +36,23 @@ const newUser = TryCatch(async (req, res, next) => {
     avatar,
   });
 
-  sendToken(res, user, 201, "User created successfully");
+  sendToken(res, user, 201, "User created");
 });
 
+// Login user and save token in cookie
 const login = TryCatch(async (req, res, next) => {
   const { username, password } = req.body;
+
   const user = await User.findOne({ username }).select("+password");
 
-  if (!user) return next(new ErrorHandler("Invalid username or password", 404));
+  if (!user) return next(new ErrorHandler("Invalid Username or Password", 404));
 
   const isMatch = await compare(password, user.password);
 
   if (!isMatch)
-    return next(new ErrorHandler("Invalid usernaem or Password", 404));
+    return next(new ErrorHandler("Invalid Username or Password", 404));
 
-  sendToken(res, user, 200, `Welcome Back to ${user.name}`);
+  sendToken(res, user, 200, `Welcome Back, ${user.name}`);
 });
 
 const getMyProfile = TryCatch(async (req, res, next) => {
@@ -68,29 +72,33 @@ const logout = TryCatch(async (req, res) => {
     .cookie("chattu-token", "", { ...cookieOptions, maxAge: 0 })
     .json({
       success: true,
-      message: "Logged Out Successfully",
+      message: "Logged out successfully",
     });
 });
 
 const searchUser = TryCatch(async (req, res) => {
   const { name = "" } = req.query;
 
+  // Finding All my chats
   const myChats = await Chat.find({ groupChat: false, members: req.user });
 
+  //  extracting All Users from my chats means friends or people I have chatted with
   const allUsersFromMyChats = myChats.flatMap((chat) => chat.members);
 
+  // Finding all users except me and my friends
   const allUsersExceptMeAndFriends = await User.find({
     _id: { $nin: allUsersFromMyChats },
     name: { $regex: name, $options: "i" },
   });
 
-  const users = allUsersExceptMeAndFriends.map((_id, name, avatar) => ({
+  // Modifying the response
+  const users = allUsersExceptMeAndFriends.map(({ _id, name, avatar }) => ({
     _id,
     name,
     avatar: avatar.url,
   }));
 
-  res.status(200).json({
+  return res.status(200).json({
     success: true,
     users,
   });
@@ -106,7 +114,7 @@ const sendFriendRequest = TryCatch(async (req, res, next) => {
     ],
   });
 
-  if (request) return next(new ErrorHandler("Request already sent", 404));
+  if (request) return next(new ErrorHandler("Request already sent", 400));
 
   await Request.create({
     sender: req.user,
@@ -115,9 +123,9 @@ const sendFriendRequest = TryCatch(async (req, res, next) => {
 
   emitEvent(req, NEW_REQUEST, [userId]);
 
-  res.status(201).json({
+  return res.status(200).json({
     success: true,
-    message: "Friend Request Sent Successfully",
+    message: "Friend Request Sent",
   });
 });
 
@@ -130,9 +138,9 @@ const acceptFriendRequest = TryCatch(async (req, res, next) => {
 
   if (!request) return next(new ErrorHandler("Request not found", 404));
 
-  if (request.receiver._id !== req.user.toString())
+  if (request.receiver._id.toString() !== req.user.toString())
     return next(
-      new ErrorHandler("You are not allowed authorized to accept request", 401)
+      new ErrorHandler("You are not authorized to accept this request", 401)
     );
 
   if (!accept) {
@@ -140,7 +148,7 @@ const acceptFriendRequest = TryCatch(async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "Friend Request Cancelled Successfully",
+      message: "Friend Request Rejected",
     });
   }
 
@@ -149,27 +157,27 @@ const acceptFriendRequest = TryCatch(async (req, res, next) => {
   await Promise.all([
     Chat.create({
       members,
-      name: `${request.sender.name} - ${request.receiver.name}`,
+      name: `${request.sender.name}-${request.receiver.name}`,
     }),
     request.deleteOne(),
   ]);
 
   emitEvent(req, REFETCH_CHATS, members);
 
-  res.status(200).json({
+  return res.status(200).json({
     success: true,
     message: "Friend Request Accepted",
-    senderId: req.sender._id,
+    senderId: request.sender._id,
   });
 });
 
 const getMyNotifications = TryCatch(async (req, res) => {
-  const request = await Request.findOne({ receiver: req.user }).populate(
+  const requests = await Request.find({ receiver: req.user }).populate(
     "sender",
     "name avatar"
   );
 
-  const allRequests = request.map(({ _id, sender }) => ({
+  const allRequests = requests.map(({ _id, sender }) => ({
     _id,
     sender: {
       _id: sender._id,
@@ -222,13 +230,13 @@ const getMyFriends = TryCatch(async (req, res) => {
 });
 
 export {
-  newUser,
-  login,
+  acceptFriendRequest,
+  getMyFriends,
+  getMyNotifications,
   getMyProfile,
+  login,
   logout,
+  newUser,
   searchUser,
   sendFriendRequest,
-  acceptFriendRequest,
-  getMyNotifications,
-  getMyFriends
 };

@@ -12,11 +12,11 @@ import {
   CHAT_JOINED,
   CHAT_LEAVED,
   NEW_MESSAGE,
-  NEW_MESSAGE_ALERT, 
+  NEW_MESSAGE_ALERT,
   ONLINE_USERS,
   START_TYPING,
   STOP_TYPING,
-} from "./constants/eveents.js";
+} from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
