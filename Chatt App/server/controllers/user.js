@@ -57,7 +57,8 @@ const login = TryCatch(async (req, res, next) => {
 
 const getMyProfile = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
-
+  console.log(req.user, "requested user");
+  
   if (!user) return next(new ErrorHandler("User not found", 404));
 
   res.status(200).json({
@@ -78,6 +79,9 @@ const logout = TryCatch(async (req, res) => {
 
 const searchUser = TryCatch(async (req, res) => {
   const { name = "" } = req.query;
+
+  console.log(req.query);
+  
 
   // Finding All my chats
   const myChats = await Chat.find({ groupChat: false, members: req.user });
@@ -131,6 +135,9 @@ const sendFriendRequest = TryCatch(async (req, res, next) => {
 
 const acceptFriendRequest = TryCatch(async (req, res, next) => {
   const { requestId, accept } = req.body;
+
+  console.log(req.body);
+  
 
   const request = await Request.findById(requestId)
     .populate("sender", "name")
@@ -194,11 +201,14 @@ const getMyNotifications = TryCatch(async (req, res) => {
 
 const getMyFriends = TryCatch(async (req, res) => {
   const chatId = req.query.chatId;
-
+  console.log(req.query);
+  
   const chats = await Chat.find({
     members: req.user,
     groupChat: false,
   }).populate("members", "name avatar");
+
+  console.log(chats,"chats");
 
   const friends = chats.map(({ members }) => {
     const otherUser = getOtherMember(members, req.user);
@@ -210,12 +220,17 @@ const getMyFriends = TryCatch(async (req, res) => {
     };
   });
 
+  console.log(friends,"friends");
+  
+
   if (chatId) {
     const chat = await Chat.findById(chatId);
 
     const availableFriends = friends.filter(
       (friend) => !chat.members.includes(friend._id)
     );
+
+    console.log(availableFriends,"friends");
 
     return res.status(200).json({
       success: true,

@@ -40,7 +40,7 @@ app.put(
   sendRequestValidator(),
   validateHandler,
   sendFriendRequest
-);
+); 
 
 app.put(
   "/acceptrequest",

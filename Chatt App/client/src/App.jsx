@@ -1,7 +1,12 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ProtechRoute from "./components/auth/ProtectRoute";
-import LoadersLayout from "./components/layout/Loaders";
+import ProtectRoute from "./components/auth/ProtectRoute"; // Corrected here
+import axios from "axios";
+import { server } from "./constants/config";
+import { useDispatch, useSelector } from "react-redux";
+import { userExists, userNotExists } from "./redux/reducers/auth";
+import LayoutLoader from "./components/layout/Loaders"; // Corrected here
+import { Toaster } from "react-hot-toast";
 
 const Home = lazy(() => import("./pages/Home"));
 const Chat = lazy(() => import("./pages/Chat"));
@@ -15,14 +20,24 @@ const ChatManagement = lazy(() => import("./pages/admin/ChatManagement"));
 const MessageManagement = lazy(() => import("./pages/admin/MessageManagement"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 
-let user = true;
-
 const App = () => {
-  return (
+  const { user, loader } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    axios
+      .get(`${server}/api/v1/user/me`,{withCredentials:true})
+      .then(({data}) =>dispatch(userExists(data.user)))
+      .catch((err) => dispatch(userNotExists()));
+  }, [dispatch]);
+
+  return loader ? (
+    <LayoutLoader />
+  ) : (
     <Router>
-      <Suspense fallback={<LoadersLayout />}>
+      <Suspense fallback={<LayoutLoader />}> {/* Corrected here */}
         <Routes>
-          <Route element={<ProtechRoute user={user} />}>
+          <Route element={<ProtectRoute user={user} />}> {/* Corrected here */}
             <Route path="/" element={<Home />} />
             <Route path="/chat/:chatId" element={<Chat />} />
             <Route path="/groups" element={<Groups />} />
@@ -31,9 +46,9 @@ const App = () => {
           <Route
             path="/login"
             element={
-              <ProtechRoute user={!user} redirect="/">
+              <ProtectRoute user={!user} redirect="/">
                 <Login />
-              </ProtechRoute>
+              </ProtectRoute>
             }
           />
 
@@ -46,6 +61,7 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+      <Toaster position="bottom-center"/>
     </Router>
   );
 };
